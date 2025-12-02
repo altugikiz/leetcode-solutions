@@ -1,46 +1,55 @@
 public class LongestPalindromicSubstring {
     public String longestPalindrome(String s) {
         int n = s.length();
+        if (n == 0)
+            return "";
 
-        // Edge Case: Boş veya tek harf ise kendisini döndür
-        if (n <= 1)
-            return s;
-
-        // dp[i][j] -> s[i...j] aralığı palindrom mu?
+        // DP Tablosu: Varsayılan değerler false'tur.
         boolean[][] dp = new boolean[n][n];
 
-        // En uzun palindromu takip etmek için değişkenler
-        int start = 0;
-        int maxLen = 1;
+        int start = 0; // En uzun palindromun başlangıcı
+        int maxLen = 1; // En uzun palindromun uzunluğu
 
-        // BOTTOM-UP YAKLAŞIM:
-        // i: Başlangıç noktası (Sondan başa doğru geliyoruz)
-        // j: Bitiş noktası (i'den sona doğru gidiyoruz)
-        for (int i = n - 1; i >= 0; i--) {
-            for (int j = i; j < n; j++) {
+        // ADIM 1: Tek harfli palindromlar (Köşegen)
+        for (int i = 0; i < n; i++) {
+            dp[i][i] = true;
+        }
 
-                // 1. Kural: Uçtaki karakterler eşit olmalı
-                if (s.charAt(i) == s.charAt(j)) {
+        // ADIM 2: İki harfli palindromlar (Özel durum kontrolü)
+        // Bunu ayrı yapıyoruz çünkü "içerisi" diye bir şey yok.
+        for (int i = 0; i < n - 1; i++) {
+            if (s.charAt(i) == s.charAt(i + 1)) {
+                dp[i][i + 1] = true;
+                start = i;
+                maxLen = 2;
+            }
+        }
 
-                    // 2. Kural:
-                    // (j - i < 2): Harfler yan yanaysa veya aynı harfse (aa, a) -> True
-                    // dp[i+1][j-1]: İç kısım (sol alt çapraz) palindromsa -> True
-                    if ((j - i < 2) || dp[i + 1][j - 1]) {
-                        dp[i][j] = true;
+        // ADIM 3: 3 ve daha fazla harfli palindromlar
+        // len: şu an kontrol ettiğimiz uzunluk
+        for (int len = 3; len <= n; len++) {
+            // i: başlangıç indeksi
+            for (int i = 0; i <= n - len; i++) {
 
-                        // ÖNCEKİ SORUDAN FARK:
-                        // Eğer şu an bulduğumuz palindrom, elimizdeki rekor uzunluktan büyükse
-                        // güncelle.
-                        if (j - i + 1 > maxLen) {
-                            start = i; // Yeni başlangıç noktası
-                            maxLen = j - i + 1; // Yeni uzunluk
-                        }
+                // j: bitiş indeksi (başlangıç + uzunluk - 1)
+                int j = i + len - 1;
+
+                // KURAL:
+                // 1. Uçtaki harfler (s[i] ve s[j]) eşit mi?
+                // 2. Aradaki parça (dp[i+1][j-1]) palindrom mu?
+                if (s.charAt(i) == s.charAt(j) && dp[i + 1][j - 1]) {
+                    dp[i][j] = true;
+
+                    // Eğer şu anki uzunluk (len) rekorumuzdan büyükse güncelle
+                    if (len > maxLen) {
+                        start = i;
+                        maxLen = len;
                     }
                 }
             }
         }
 
-        // En uzun palindromu kesip döndür
+        // Sonucu kesip döndür
         return s.substring(start, start + maxLen);
     }
 }
