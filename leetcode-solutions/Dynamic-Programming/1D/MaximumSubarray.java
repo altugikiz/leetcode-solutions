@@ -1,21 +1,20 @@
 public class MaximumSubarray {
     public int maxSubArray(int[] nums) {
-        // İlk elemanı başlangıç değeri olarak alıyoruz
-        int currentMax = nums[0];
-        int globalMax = nums[0];
+        int n = nums.length;
+        int[] dp = new int[n];
 
-        // Döngüye 2. elemandan (index 1) başlıyoruz
-        for (int i = 1; i < nums.length; i++) {
-            // Karar Anı: Ya yeni bir alt dizi başlat (nums[i])
-            // ya da önceki toplama ekle (nums[i] + currentMax)
-            currentMax = Math.max(nums[i], nums[i] + currentMax);
+        // Base Case
+        dp[0] = nums[0];
+        int maxSoFar = dp[0];
 
-            // Genel maksimumu güncelle
-            if (currentMax > globalMax) {
-                globalMax = currentMax;
-            }
+        for (int i = 1; i < n; i++) {
+            // Yineleme Bağıntısı: dp[i] = max(nums[i], nums[i] + dp[i-1])
+            dp[i] = Math.max(nums[i], nums[i] + dp[i - 1]);
+
+            // Cevabı güncelle
+            maxSoFar = Math.max(maxSoFar, dp[i]);
         }
 
-        return globalMax;
+        return maxSoFar;
     }
 }
